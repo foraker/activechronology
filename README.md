@@ -1,15 +1,13 @@
-# Activechronology
+# ActiveChronology
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/activechronology`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Easily scope your ActiveRecord models by timestamps or dates.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'activechronology'
+gem 'activechronology', require: 'active_chronology'
 ```
 
 And then execute:
@@ -22,7 +20,31 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### `set_chronology`
+
+From your ActiveRecord models, you can add `chronological` and `reverse_chronological`
+scopes by calling `set_chronology`. This accepts an attribute name as a parameter,
+and it defaults to `created_at`.
+
+### `scope_by_timestamp`
+
+Calling `scope_by_timestamp` with a list of attribute names, you get the following
+methods defined, using `:created_at` as an example:
+
+```
+created_after(time)
+created_before(time)
+created_between(start time, end time)
+```
+
+Here's an example class:
+
+```ruby
+class User
+  set_chronology :last_seen_at
+  scope_by_timestamp :last_seen_at
+end
+```
 
 ## Development
 
@@ -38,4 +60,3 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-

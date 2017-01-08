@@ -14,17 +14,30 @@ module ActiveChronology
         attributes.each do |attribute|
           name = attribute.to_s.sub(/_(at|on|time|date)$/, '')
 
-          scope "#{name}_after",   single_time_scope(attribute, '>=')
-          scope "#{name}_before",  single_time_scope(attribute, '<=')
-          scope "#{name}_between", -> (start_time, end_time) { where(attribute => start_time..end_time) }
+          scope "#{name}_after",   single_time_scope(attribute, '>')
+          scope "#{name}_before",  single_time_scope(attribute, '<')
+          scope "#{name}_between", between_time_scope(attribute)
         end
       end
 
       private
 
       def single_time_scope(attribute, operator)
-        -> (time) do
+        -> (time, options = {}) do
+          operator += '=' unless options[:exclusive]
+
           time.present? ? where("#{table_name}.#{attribute} #{operator} ?", time) : all
+        end
+      end
+
+      def between_time_scope(attribute)
+        -> (start_time, end_time, options = {}) do
+          if options[:exclusive]
+            where(
+              "#{table_name}.#{attribute} > ? AND #{table_name}.#{attribute} < ?", start_time, end_time)
+          else
+            where(attribute => start_time..end_time)
+          end
         end
       end
     end
